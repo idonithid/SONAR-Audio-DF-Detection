@@ -121,13 +121,56 @@
 
 <section>
   <h2>Where the HF signal lives inside SONAR</h2>
-  <figure class="small">
-    <img src="figures/c2_baseline_vs_sonar_hf.png" alt="HF-probe EER vs training fraction: baseline vs SONAR content vs SONAR noise">
+  <p>
+    SONAR's central claim is that audio deepfake detectors miss high-frequency
+    artifacts because the encoder itself is HF-blind. To test that claim
+    directly — and to ask whether SONAR's training fixes the blindness — we run
+    a simple <em>probing</em> experiment on the trained encoders.
+  </p>
+  <p>
+    <strong>Setup.</strong> We freeze the encoder, take each clip, high-pass
+    filter it at <em>f<sub>c</sub></em> = 4&nbsp;kHz (everything below 4 kHz
+    removed), feed it through the encoder, and mean-pool the resulting
+    sequence into a single fixed-length embedding. We then train a small
+    <em>linear</em> classifier on those embeddings to distinguish real from
+    fake on the In-the-Wild test set. If the encoder genuinely carries HF
+    cues, the linear probe will discriminate well; if the encoder discards
+    HF information, the probe will be near chance.
+  </p>
+  <p>
+    <strong>What we vary.</strong> We compare three encoders and sweep how
+    much training data the probe sees (10%, 25%, 50%, 100% of the dev set).
+    More data should help if the HF signal exists in the embedding but is
+    faint and hard to extract from few samples.
+  </p>
+  <ul style="margin-top:-0.4rem">
+    <li><strong>Baseline XLSR</strong> — the off-the-shelf, single-encoder XLSR + AASIST detector (red, dashed).</li>
+    <li><strong>SONAR content branch</strong> — one of SONAR's two SSL encoders; sees the raw waveform like the baseline (green).</li>
+    <li><strong>SONAR noise branch</strong> — the other SSL encoder; receives SRM-filtered audio and is JS-aligned with the content branch during training (blue).</li>
+  </ul>
+
+  <figure class="wide">
+    <img src="figures/c2_baseline_vs_sonar_hf.png" alt="HF-probe EER vs training fraction for three encoders: baseline XLSR (red), SONAR content branch (green), SONAR noise branch (blue)">
     <figcaption>
       <strong>Figure 3 — HF-probe EER as a function of training-data fraction (f<sub>c</sub> = 4 kHz).</strong>
-      Linear probes on high-pass-filtered embeddings test whether the encoder represents HF cues in a discriminative way. SONAR's <span style="color:#1f77b4"><strong>noise branch</strong></span> sits well below the <span style="color:#d62728"><strong>baseline XLSR</strong></span> at every fraction (28% relative HF-EER reduction at full data). SONAR's <span style="color:#2ca02c"><strong>content branch</strong></span> is roughly on par with the baseline. The encoder is not retrained out of its spectral bias — SONAR <em>compensates</em> for it architecturally, by allocating a parallel encoder to the HF residual and tying its distribution to the content distribution through the JS alignment objective.
+      Lower is better. Each point is the equal-error rate of a linear probe trained on the (frozen) encoder's mean-pooled embeddings of high-pass-filtered audio. We sweep the training-data fraction from 10% to 100%. The grey dotted line is the corresponding LF probe (low-pass) on the baseline — it saturates immediately, showing LF cues are trivially separable.
     </figcaption>
   </figure>
+
+  <p>
+    <strong>Two findings.</strong>
+  </p>
+  <ul>
+    <li>
+      The <strong>SONAR noise branch</strong> is decisively less HF-blind than the baseline at every training fraction. At full data its HF-probe EER is 2.16% versus 2.98% for the baseline — a 28% relative reduction; at 10% data the gap is even larger (4.35% vs 5.69%, 24% relative).
+    </li>
+    <li>
+      The <strong>SONAR content branch</strong> sits roughly on top of the baseline. SONAR does <em>not</em> retrain the content encoder out of its spectral bias.
+    </li>
+  </ul>
+  <p>
+    <strong>Reading these together.</strong> SONAR doesn't fix HF blindness inside the content encoder — it <em>compensates</em> for it architecturally, by allocating a parallel encoder to the HF residual and tying its distribution to the content distribution through the Jensen–Shannon alignment loss. The HF discriminative load that the baseline cannot carry ends up in SONAR's noise branch.
+  </p>
 </section>
 
 <section>
