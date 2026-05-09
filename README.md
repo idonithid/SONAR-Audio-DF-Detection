@@ -16,7 +16,7 @@ Code for the paper *SONAR: Spectral-Contrastive Audio Residuals for Generalizabl
 ## Quickstart
 
 ```bash
-git clone https://github.com/idonithid/SONAR.git
+git clone https://github.com/idonithid/SONAR-Audio-DF-Detection.git
 cd SONAR
 pip install -r requirements.txt
 
@@ -92,7 +92,7 @@ python scripts/eval_DF.py SCORE_FILE KEYS_DIR PHASE   # ASVspoof 2021 DF
 
 ## Demo
 
-A live, browser-based demo is available at the [SONAR HuggingFace Space](https://huggingface.co/spaces/idonithid/SONAR-demo); the source for it lives in [`sonar-demo/`](sonar-demo/). A static landing page with the paper's findings is hosted on [GitHub Pages](https://idonithid.github.io/SONAR/).
+A live, browser-based demo is available at the [SONAR HuggingFace Space](https://huggingface.co/spaces/idonithid/SONAR-demo); the source for it lives in [`sonar-demo/`](sonar-demo/). A static landing page with the paper's findings is hosted on [GitHub Pages](https://idonithid.github.io/SONAR-Audio-DF-Detection/).
 
 ## Citation
 

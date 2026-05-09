@@ -162,7 +162,7 @@ Headline results (ITW EER, single run):
 | **SONAR-Finetune** | **1.45** | **1.20** | **5.43** |
 
 Code, paper, and the static landing page with our findings live at
-[github.com/idonithid/SONAR](https://github.com/idonithid/SONAR).
+[github.com/idonithid/SONAR-Audio-DF-Detection](https://github.com/idonithid/SONAR-Audio-DF-Detection).
 """
 
 with gr.Blocks(title="SONAR — Audio Deepfake Detection") as demo:
