@@ -47,6 +47,19 @@
 </section>
 
 <section>
+  <h2>Architecture</h2>
+  <figure>
+    <img src="figures/sonar_architecture.png" alt="SONAR dual-path architecture: content branch + noise branch + cross-attention + AASIST">
+    <figcaption>SONAR processes audio in parallel through a <strong>Content Feature Extractor</strong> (XLSR encoder) and a <strong>Noise Feature Extractor</strong> (RFE: learnable, value-constrained SRM filters → XLSR encoder). The two embeddings are fused via <strong>cross-attention</strong> and classified as real / fake. The Jensen–Shannon alignment loss applied during training pulls the two embeddings together for genuine speech and pushes them apart for deepfakes.</figcaption>
+  </figure>
+
+  <figure>
+    <img src="figures/srm_diagram.png" alt="Rich Feature Extractor — bank of constrained SRM high-pass filters">
+    <figcaption>The <strong>Rich Feature Extractor (RFE)</strong>: <em>M</em> learnable SRM filters (length 5, central tap fixed to −1, zero-sum constraint hard-projected after every optimiser step → strict high-pass behaviour throughout training) feed a 1×1 convolution that aggregates their outputs into the noise branch's input.</figcaption>
+  </figure>
+</section>
+
+<section>
   <h2>Headline results</h2>
   <table>
     <thead>
