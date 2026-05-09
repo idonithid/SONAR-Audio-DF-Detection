@@ -1,0 +1,11 @@
+theme: jekyll-theme-minimal
+title: "SONAR — Audio Deepfake Detection (ICML 2026)"
+description: "Spectral-Contrastive Audio Residuals for Generalizable Deepfake Detection"
+
+# Static landing page; we serve our own HTML/CSS, Jekyll just needs to publish them.
+include:
+  - figures
+  - assets
+
+# Avoid Jekyll processing for our static site
+plugins: []

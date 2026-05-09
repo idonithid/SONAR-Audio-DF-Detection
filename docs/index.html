@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SONAR — Spectral-Contrastive Audio Residuals for Generalizable Deepfake Detection</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>SONAR</h1>
+  <p class="subtitle">Spectral-Contrastive Audio Residuals for Generalizable Deepfake Detection</p>
+  <p class="venue">ICML 2026 (regular track)</p>
+  <p class="authors">
+    <a href="mailto:idon@mail.tau.ac.il">Ido Nitzan Hidekel</a> ·
+    <a href="mailto:lifshitz@mail.tau.ac.il">Gal Lifshitz</a> ·
+    <a href="mailto:khencohen@mail.tau.ac.il">Khen Cohen</a> ·
+    <a href="mailto:darav@tauex.tau.ac.il">Dan Raviv</a>
+  </p>
+  <p class="affiliations">Tel Aviv University — Schools of Electrical Engineering and Physics &amp; Astronomy</p>
+
+  <p class="cta">
+    <a class="btn primary" id="demo-link" href="https://huggingface.co/spaces/idonithid/SONAR-demo">Try the live demo →</a>
+    <a class="btn" href="https://github.com/idonithid/SONAR">GitHub</a>
+    <a class="btn" href="paper.pdf">Paper (PDF)</a>
+  </p>
+  <p id="space-status" class="status" aria-live="polite">Checking demo status…</p>
+</header>
+
+<main>
+
+<section>
+  <h2>TL;DR</h2>
+  <p>
+    Modern speech-synthesis systems leave subtle high-frequency (HF) artifacts that
+    frequency-agnostic detectors ignore — a manifestation of <em>spectral bias</em>.
+    <strong>SONAR</strong> is a dual-path detector that fuses an XLSR content branch
+    with a parallel branch driven by learnable, value-constrained SRM high-pass
+    filters, and trains them with a <em>Jensen–Shannon alignment loss</em> that pulls
+    genuine LF/HF representations together while pushing fake ones apart. SONAR
+    achieves single-run state-of-the-art on ASVspoof&nbsp;2021 and In-the-Wild,
+    converges 4× faster than strong baselines, and degrades gracefully under codecs
+    and bandwidth shifts.
+  </p>
+</section>
+
+<section>
+  <h2>Headline results</h2>
+  <table>
+    <thead>
+      <tr><th>Model</th><th>DF EER ↓</th><th>LA EER ↓</th><th>In-the-Wild EER ↓</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>XLSR + AASIST (baseline)</td><td>3.69</td><td>1.90</td><td>10.46</td></tr>
+      <tr><td>XLSR-Mamba</td><td>1.88</td><td>0.93</td><td>6.71</td></tr>
+      <tr><td><strong>SONAR-Full</strong></td><td><strong>1.57</strong></td><td><strong>1.55</strong></td><td><strong>6.00</strong></td></tr>
+      <tr><td><strong>SONAR-Finetune</strong></td><td><strong>1.45</strong></td><td><strong>1.20</strong></td><td><strong>5.43</strong></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Key findings</h2>
+  <ul>
+    <li><strong>Spectral bias is a generalisation bottleneck.</strong> When low-frequency content is removed (high-pass &gt; 4 kHz), baseline models collapse to 32% EER while SONAR retains 26% — direct evidence the baseline relies on LF correlations, while SONAR captures genuine HF artifacts.</li>
+    <li><strong>The gain is alignment, not capacity.</strong> A dual-encoder model without RFE or JS scores 8.91% on ITW; full SONAR scores 6.00% with the same parameter count.</li>
+    <li><strong>4× faster convergence.</strong> SONAR-Full stabilises in 12 epochs (Tak et al. trained 100); SONAR-Finetune in 4–6 epochs.</li>
+    <li><strong>Robust to codecs.</strong> Through MP3, Opus, Vorbis, and the DAC neural codec, score ranking is preserved (Spearman ρ = 0.944 for DAC).</li>
+    <li><strong>2× FLOPs, 2× params, but only ~25% wall-clock overhead</strong> because the two encoders run concurrently on GPU (29 ms → 57 ms / 4-s clip).</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Figures</h2>
+
+  <figure>
+    <img src="figures/corr_fig.png" alt="LF–HF Pearson correlation between real and fake speech">
+    <figcaption>Genuine speech shows strong LF–HF co-modulation (r ≈ 0.6); spoofed speech collapses toward zero or negative.</figcaption>
+  </figure>
+
+  <figure>
+    <img src="figures/histogram.png" alt="Cosine similarity between LF and HF embeddings">
+    <figcaption>After training, real samples cluster near +1 LF–HF cosine similarity; fake samples land around −0.2.</figcaption>
+  </figure>
+
+  <figure>
+    <img src="figures/roc_improved.png" alt="ROC curves on high-pass-filtered audio">
+    <figcaption>On audio high-pass-filtered &gt; 4 kHz (LF removed), baselines collapse (AUC ≈ 0.75) while SONAR retains discriminative power (AUC ≈ 0.80).</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Citation</h2>
+  <pre><code>@inproceedings{hidekel2026sonar,
+  title     = {{SONAR}: Spectral-Contrastive Audio Residuals for Generalizable Deepfake Detection},
+  author    = {Hidekel, Ido Nitzan and Lifshitz, Gal and Cohen, Khen and Raviv, Dan},
+  booktitle = {Proceedings of the 43rd International Conference on Machine Learning (ICML)},
+  year      = {2026}
+}</code></pre>
+</section>
+
+</main>
+
+<footer>
+  <p>
+    Code: <a href="https://github.com/idonithid/SONAR">github.com/idonithid/SONAR</a> · MIT License ·
+    Pretrained weights: derivative of <a href="https://github.com/facebookresearch/fairseq/tree/main/examples/wav2vec/xlsr">XLSR</a> (CC-BY-NC-4.0).
+  </p>
+  <p>
+    This page is a static archive of the paper's findings — it remains accessible
+    even when the live demo Space is asleep.
+  </p>
+</footer>
+
+<script src="status.js" defer></script>
+</body>
+</html>

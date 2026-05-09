@@ -1,0 +1,15 @@
+# SONAR demo (HuggingFace Spaces)
+torch>=2.0
+torchaudio>=2.0
+numpy>=1.21
+scipy>=1.9
+soundfile>=0.12
+librosa>=0.10
+plotly>=5.10
+gradio>=4.0
+huggingface_hub>=0.20
+
+# SSL backbone (XLSR via fairseq)
+fairseq==0.12.2
+omegaconf>=2.0
+hydra-core>=1.0
