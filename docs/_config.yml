@@ -1,11 +1,5 @@
-theme: jekyll-theme-minimal
+# .nojekyll is present in this folder, so GitHub Pages serves these files
+# directly and does not invoke the Jekyll build pipeline. This file is kept
+# only as a hint to readers; it has no effect when .nojekyll is present.
 title: "SONAR — Audio Deepfake Detection (ICML 2026)"
 description: "Spectral-Contrastive Audio Residuals for Generalizable Deepfake Detection"
-
-# Static landing page; we serve our own HTML/CSS, Jekyll just needs to publish them.
-include:
-  - figures
-  - assets
-
-# Avoid Jekyll processing for our static site
-plugins: []
