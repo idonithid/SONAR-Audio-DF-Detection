@@ -2,7 +2,7 @@
 
 Usage:
     pip install --upgrade huggingface_hub
-    huggingface-cli login                 # paste a write-scoped token
+    hf auth login                         # paste a write-scoped token (legacy: huggingface-cli login)
     python scripts/upload_to_hf.py \\
         --repo_id idonithid/SONAR-weights \\
         --create
@@ -99,7 +99,7 @@ def main():
     try:
         api.whoami()
     except Exception as e:
-        sys.exit(f"not logged in to HF Hub: {e}\nrun: huggingface-cli login")
+        sys.exit(f"not logged in to HF Hub: {e}\nrun: hf auth login")
 
     if args.create:
         api.create_repo(repo_id=args.repo_id, repo_type="model",

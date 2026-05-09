@@ -17,11 +17,13 @@ The Space lazy-loads weights from the model repo at first request, so you upload
 2. Type: **Write**, name e.g. `sonar-deploy`. Copy the value.
 3. On this machine:
 ```bash
-huggingface-cli login
+hf auth login
 # paste the token when prompted
 ```
 
 This caches the token at `~/.cache/huggingface/token`. All scripts below pick it up automatically.
+
+> **Note** — the legacy `huggingface-cli` is deprecated; use `hf` (already installed via the `huggingface_hub` package). The Python library API used by `scripts/upload_to_hf.py` is unaffected.
 
 ---
 
@@ -52,7 +54,7 @@ The Space is just a small clone-and-push from `sonar-demo/`.
 
 ```bash
 # Create the Space (one-time)
-huggingface-cli repo create SONAR-demo --type space --space_sdk gradio
+hf repos create idonithid/SONAR-demo --type space --space-sdk gradio
 ```
 
 Then push the contents:
@@ -84,7 +86,7 @@ Drop a few short `.wav` clips into `SONAR-demo/examples/` (e.g. one bonafide, on
 
 | Symptom                                              | Fix                                                                              |
 |------------------------------------------------------|----------------------------------------------------------------------------------|
-| `huggingface-cli: not logged in`                     | Re-run `huggingface-cli login` with a Write-scope token.                          |
+| `hf: not logged in`                                  | Re-run `hf auth login` with a Write-scope token.                                  |
 | Upload hangs at one file                             | The script is resumable — re-run with `--only <filename>` to retry that file.    |
 | Space build error: "fairseq install failed"          | Pin a different fairseq version in `sonar-demo/requirements.txt` (e.g. `fairseq==0.12.2` is most stable).                                                  |
 | Space cold start times out (>5 min)                  | Pre-load weights at build time: add `python -c "from huggingface_hub import hf_hub_download; hf_hub_download('idonithid/SONAR-weights', 'xlsr2_300m.pt')"` to a `prerun.sh`. |
