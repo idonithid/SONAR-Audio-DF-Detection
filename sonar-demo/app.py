@@ -28,10 +28,17 @@ import gradio as gr  # noqa: E402
 
 _DETECTOR = None
 _INIT_ERROR = None
-SONAR_CKPT = os.environ.get(
-    "SONAR_CKPT",
-    str(_REPO / "checkpoints" / "sonar_full_xlsr_aasist_eer6.pth"),
-)
+HF_REPO = os.environ.get("SONAR_HF_REPO", "idonithid/SONAR-weights")
+
+
+def _resolve_ckpts():
+    """Fetch SONAR-Full weights and the XLSR-300M backbone from HF Hub."""
+    from huggingface_hub import hf_hub_download
+    sonar_ckpt = hf_hub_download(repo_id=HF_REPO,
+                                 filename="sonar_full_xlsr_aasist_eer6.pth")
+    xlsr_ckpt  = hf_hub_download(repo_id=HF_REPO, filename="xlsr2_300m.pt")
+    os.environ["SONAR_XLSR_CKPT"] = xlsr_ckpt
+    return sonar_ckpt
 
 
 def _detector():
@@ -39,8 +46,9 @@ def _detector():
     if _DETECTOR is not None or _INIT_ERROR is not None:
         return _DETECTOR
     try:
+        sonar_ckpt = _resolve_ckpts()
         from sonar.inference import SONARDetector
-        _DETECTOR = SONARDetector(ckpt=SONAR_CKPT)
+        _DETECTOR = SONARDetector(ckpt=sonar_ckpt)
     except Exception as e:
         _INIT_ERROR = f"{type(e).__name__}: {e}"
     return _DETECTOR

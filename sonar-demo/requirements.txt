@@ -1,15 +1,13 @@
 # SONAR demo (HuggingFace Spaces)
-torch>=2.0
-torchaudio>=2.0
-numpy>=1.21
-scipy>=1.9
+gradio>=4.0
+plotly>=5.10
 soundfile>=0.12
 librosa>=0.10
-plotly>=5.10
-gradio>=4.0
-huggingface_hub>=0.20
 
-# SSL backbone (XLSR via fairseq)
-fairseq==0.12.2
-omegaconf>=2.0
-hydra-core>=1.0
+# Pull the SONAR package + its model code straight from the GitHub repo.
+# This brings in torch, fairseq, scipy, etc. via pyproject.toml.
+git+https://github.com/idonithid/SONAR-Audio-DF-Detection.git
+
+# Hub client for lazy checkpoint download (declared explicitly because
+# huggingface_hub is not in the package's transitive deps yet).
+huggingface_hub>=0.20

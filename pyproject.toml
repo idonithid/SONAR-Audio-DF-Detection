@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sonar-deepfake-detection"
+version = "1.0.0"
+description = "SONAR — Spectral-Contrastive Audio Residuals for Generalizable Deepfake Detection (ICML 2026)"
+authors = [
+    { name = "Ido Nitzan Hidekel", email = "idon@mail.tau.ac.il" },
+    { name = "Gal Lifshitz",       email = "lifshitz@mail.tau.ac.il" },
+    { name = "Khen Cohen",         email = "khencohen@mail.tau.ac.il" },
+    { name = "Dan Raviv",          email = "darav@tauex.tau.ac.il" },
+]
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "torch>=2.0",
+    "numpy>=1.21",
+    "scipy>=1.9",
+    "soundfile>=0.12",
+    "librosa>=0.10",
+    "scikit-learn>=1.1",
+    "fairseq==0.12.2",
+    "omegaconf>=2.0",
+]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.urls]
+Homepage    = "https://idonithid.github.io/SONAR-Audio-DF-Detection/"
+Repository  = "https://github.com/idonithid/SONAR-Audio-DF-Detection"
+Paper       = "https://arxiv.org/abs/2511.21325"
+
+[tool.setuptools.packages.find]
+include = ["sonar*"]
+exclude = ["tests*", "bench*", "docs*", "scripts*", "sonar-demo*", "checkpoints*"]
