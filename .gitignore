@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Experiment tracking
+wandb/
+runs/
+lightning_logs/
+
+# Pretrained checkpoints (download via scripts/download_checkpoints.py)
+*.pth
+*.pt
+*.ckpt
+checkpoints/*.pth
+checkpoints/*.pt
+!checkpoints/README.md
+
+# Score files / eval outputs
+eval_*.txt
+score_*.txt
+
+# Build / docs
+docs/_build/
+site/
+
+# Local-only
+.env
+.env.*
+!.env.example
+local/

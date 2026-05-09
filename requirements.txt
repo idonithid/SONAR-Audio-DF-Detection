@@ -1,0 +1,29 @@
+# Core
+torch>=2.0
+torchaudio>=2.0
+numpy>=1.21
+scipy>=1.9
+soundfile>=0.12
+librosa>=0.10
+scikit-learn>=1.1
+pandas>=1.5
+
+# SSL backbone
+fairseq==0.12.2
+omegaconf>=2.0
+hydra-core>=1.0
+
+# HF Hub for checkpoint distribution
+huggingface_hub>=0.20
+
+# Plotting / benchmarks
+matplotlib>=3.5
+plotly>=5.10
+calflops>=0.2
+
+# Optional: experiment tracking
+# wandb>=0.16
+# tensorboard>=2.10
+
+# Optional: demo (only needed for sonar-demo/)
+# gradio>=4.0

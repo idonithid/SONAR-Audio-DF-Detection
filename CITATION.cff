@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: "If you use this software in your research, please cite the SONAR paper."
+title: "SONAR: Spectral-Contrastive Audio Residuals for Generalizable Deepfake Detection"
+authors:
+  - family-names: "Hidekel"
+    given-names: "Ido Nitzan"
+    affiliation: "School of Electrical Engineering, Tel Aviv University"
+    email: "idon@mail.tau.ac.il"
+  - family-names: "Lifshitz"
+    given-names: "Gal"
+    affiliation: "School of Electrical Engineering, Tel Aviv University"
+    email: "lifshitz@mail.tau.ac.il"
+  - family-names: "Cohen"
+    given-names: "Khen"
+    affiliation: "School of Physics and Astronomy, Tel Aviv University"
+    email: "khencohen@mail.tau.ac.il"
+  - family-names: "Raviv"
+    given-names: "Dan"
+    affiliation: "School of Electrical Engineering, Tel Aviv University"
+    email: "darav@tauex.tau.ac.il"
+year: 2026
+preferred-citation:
+  type: conference-paper
+  authors:
+    - family-names: "Hidekel"
+      given-names: "Ido Nitzan"
+    - family-names: "Lifshitz"
+      given-names: "Gal"
+    - family-names: "Cohen"
+      given-names: "Khen"
+    - family-names: "Raviv"
+      given-names: "Dan"
+  title: "SONAR: Spectral-Contrastive Audio Residuals for Generalizable Deepfake Detection"
+  conference:
+    name: "Proceedings of the 43rd International Conference on Machine Learning (ICML)"
+  year: 2026
