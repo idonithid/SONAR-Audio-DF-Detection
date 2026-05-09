@@ -1,5 +1,8 @@
-// Pings the HF Space's runtime API to set a green/yellow/red status badge.
-// Falls back gracefully if CORS blocks the request — the user can still click.
+// Pings the HF Space's runtime API to set a status badge on the demo button.
+// Handles three cases:
+//   - Space exists and is up/asleep/down  -> green/yellow/red badge
+//   - Space does not exist yet (404)      -> "demo not yet deployed" note
+//   - CORS / network error                -> silent (button text already says "coming soon")
 
 (async () => {
   const SPACE = "idonithid/SONAR-demo";
@@ -11,9 +14,20 @@
     const r = await fetch(`https://huggingface.co/api/spaces/${SPACE}/runtime`, {
       cache: "no-store",
     });
+    if (r.status === 404) {
+      el.textContent = "Demo Space is not yet deployed. The findings and figures on this page work without it.";
+      return;
+    }
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const j = await r.json();
     const stage = (j && j.stage) || "unknown";
+
+    if (link) {
+      link.classList.remove("disabled");
+      link.removeAttribute("aria-disabled");
+      link.href = `https://huggingface.co/spaces/${SPACE}`;
+      link.textContent = "Try the live demo →";
+    }
 
     if (stage === "RUNNING") {
       el.textContent = "🟢 Demo is online — click above to try it.";
@@ -24,11 +38,10 @@
     } else if (stage === "STOPPED" || stage === "BUILD_ERROR" || stage === "RUNTIME_ERROR") {
       el.textContent = `🔴 Demo is offline (${stage.toLowerCase()}). The figures and findings on this page still work.`;
       el.classList.add("down");
-      if (link) link.style.opacity = "0.55";
     } else {
       el.textContent = `Demo state: ${stage.toLowerCase()}`;
     }
   } catch (e) {
-    el.textContent = "Demo status unknown — click above to check directly.";
+    /* silent: button already says "coming soon" */
   }
 })();

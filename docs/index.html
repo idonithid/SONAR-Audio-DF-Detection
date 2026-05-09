@@ -22,11 +22,11 @@
   <p class="affiliations">Tel Aviv University — Schools of Electrical Engineering and Physics &amp; Astronomy</p>
 
   <p class="cta">
-    <a class="btn primary" id="demo-link" href="https://huggingface.co/spaces/idonithid/SONAR-demo">Try the live demo →</a>
     <a class="btn" href="https://github.com/idonithid/SONAR-Audio-DF-Detection">GitHub</a>
+    <a class="btn primary disabled" id="demo-link" aria-disabled="true">Live demo (coming soon)</a>
     <a class="btn" href="paper.pdf">Paper (PDF)</a>
   </p>
-  <p id="space-status" class="status" aria-live="polite">Checking demo status…</p>
+  <p id="space-status" class="status" aria-live="polite"></p>
 </header>
 
 <main>
@@ -40,38 +40,71 @@
     with a parallel branch driven by learnable, value-constrained SRM high-pass
     filters, and trains them with a <em>Jensen–Shannon alignment loss</em> that pulls
     genuine LF/HF representations together while pushing fake ones apart. SONAR
-    achieves single-run state-of-the-art on ASVspoof&nbsp;2021 and In-the-Wild,
+    achieves state-of-the-art performance on ASVspoof&nbsp;2021 and In-the-Wild,
     converges 4× faster than strong baselines, and degrades gracefully under codecs
     and bandwidth shifts.
   </p>
 </section>
 
 <section>
+  <h2>Motivation</h2>
+  <p>
+    Generative voice cloning is now cheap, fast, and convincing. The 2024–2025
+    election cycle brought a wave of political audio deepfakes; voice-cloning fraud
+    has caused multi-million-dollar losses at corporations and call-centres. Yet
+    most existing detectors collapse the moment they see a generator they were
+    not trained on — a generalisation failure rather than a capacity one.
+  </p>
+  <p>
+    The pattern they share: networks fit low-frequency structure first and
+    under-utilise the subtle high-frequency residuals where vocoders leave their
+    fingerprints (the <em>frequency principle</em>). Real and synthetic speech
+    differ not only in marginal HF energy, but in the <strong>joint LF–HF
+    consistency</strong> of the signal — a relationship that frequency-agnostic
+    detectors systematically miss. SONAR is built around this observation:
+    instead of treating HF residuals as auxiliary features or aggregating them
+    late, we couple them to semantic content during training itself.
+  </p>
+</section>
+
+<section>
   <h2>Architecture</h2>
-  <figure>
-    <img src="figures/sonar_architecture.png" alt="SONAR dual-path architecture: content branch + noise branch + cross-attention + AASIST">
-    <figcaption>SONAR processes audio in parallel through a <strong>Content Feature Extractor</strong> (XLSR encoder) and a <strong>Noise Feature Extractor</strong> (RFE: learnable, value-constrained SRM filters → XLSR encoder). The two embeddings are fused via <strong>cross-attention</strong> and classified as real / fake. The Jensen–Shannon alignment loss applied during training pulls the two embeddings together for genuine speech and pushes them apart for deepfakes.</figcaption>
+  <figure class="small">
+    <img src="figures/sonar_architecture.png" alt="SONAR dual-path architecture: content branch + noise branch + cross-attention + AASIST classifier">
+    <figcaption>
+      <strong>Figure 1 — Dual-path overview.</strong>
+      Audio is processed in parallel by a <em>content</em> branch (XLSR encoder on the raw waveform) and a <em>noise</em> branch (learnable SRM high-pass filters → XLSR encoder). Their embeddings are fused via cross-attention (CA) and classified by AASIST. During training, a Jensen–Shannon alignment loss pulls the two embeddings together for genuine speech and pushes them apart for deepfakes.
+    </figcaption>
   </figure>
 
-  <figure>
+  <figure class="small">
     <img src="figures/srm_diagram.png" alt="Rich Feature Extractor — bank of constrained SRM high-pass filters">
-    <figcaption>The <strong>Rich Feature Extractor (RFE)</strong>: <em>M</em> learnable SRM filters (length 5, central tap fixed to −1, zero-sum constraint hard-projected after every optimiser step → strict high-pass behaviour throughout training) feed a 1×1 convolution that aggregates their outputs into the noise branch's input.</figcaption>
+    <figcaption>
+      <strong>Figure 2 — Rich Feature Extractor (RFE).</strong>
+      M learnable SRM filters of length 5; the central tap is fixed to −1 and a zero-sum constraint is hard-projected after every optimiser step, so each filter stays strictly high-pass throughout training. A 1×1 convolution then aggregates their outputs into the noise branch's input.
+    </figcaption>
   </figure>
 </section>
 
 <section>
   <h2>Headline results</h2>
+  <p>
+    EER (%, lower is better) under a strict <em>single-run</em> protocol — no checkpoint averaging, no ensembling. <strong>Bold</strong> is the best per column.
+  </p>
   <table>
     <thead>
       <tr><th>Model</th><th>DF EER ↓</th><th>LA EER ↓</th><th>In-the-Wild EER ↓</th></tr>
     </thead>
     <tbody>
       <tr><td>XLSR + AASIST (baseline)</td><td>3.69</td><td>1.90</td><td>10.46</td></tr>
-      <tr><td>XLSR-Mamba</td><td>1.88</td><td>0.93</td><td>6.71</td></tr>
-      <tr><td><strong>SONAR-Full</strong></td><td><strong>1.57</strong></td><td><strong>1.55</strong></td><td><strong>6.00</strong></td></tr>
-      <tr><td><strong>SONAR-Finetune</strong></td><td><strong>1.45</strong></td><td><strong>1.20</strong></td><td><strong>5.43</strong></td></tr>
+      <tr><td>XLSR-Mamba</td><td>1.88</td><td><strong>0.93</strong></td><td>6.71</td></tr>
+      <tr><td>SONAR-Full</td><td>1.57</td><td>1.55</td><td>6.00</td></tr>
+      <tr><td>SONAR-Finetune</td><td><strong>1.45</strong></td><td>1.20</td><td><strong>5.43</strong></td></tr>
     </tbody>
   </table>
+  <p class="muted">
+    XLSR-Mamba retains the lead on the in-domain LA partition (it was trained with checkpoint averaging on multiple seeds); SONAR is strongest where it matters most for deployment — out-of-distribution detection (DF and In-the-Wild).
+  </p>
 </section>
 
 <section>
@@ -82,36 +115,18 @@
     <li><strong>4× faster convergence.</strong> SONAR-Full stabilises in 12 epochs (Tak et al. trained 100); SONAR-Finetune in 4–6 epochs.</li>
     <li><strong>Robust to codecs.</strong> Through MP3, Opus, Vorbis, and the DAC neural codec, score ranking is preserved (Spearman ρ = 0.944 for DAC).</li>
     <li><strong>2× FLOPs, 2× params, but only ~25% wall-clock overhead</strong> because the two encoders run concurrently on GPU (29 ms → 57 ms / 4-s clip).</li>
-    <li><strong>SONAR's noise branch carries the HF discriminative load.</strong> Probing the two SSL branches separately on HP-filtered embeddings: the noise branch's HF-probe EER is <strong>2.16%</strong> at full data vs <strong>2.98%</strong> for the baseline (28% relative reduction); the content branch stays on par with the baseline. The encoder isn't retrained out of its spectral bias — SONAR <em>compensates</em> for it architecturally.</li>
+    <li><strong>SONAR's noise branch carries the HF discriminative load.</strong> See Figure 3 below.</li>
   </ul>
 </section>
 
 <section>
-  <h2>Figures</h2>
-
-  <figure>
-    <img src="figures/corr_fig.png" alt="LF–HF Pearson correlation between real and fake speech">
-    <figcaption>Genuine speech shows strong LF–HF co-modulation (r ≈ 0.6); spoofed speech collapses toward zero or negative.</figcaption>
-  </figure>
-
-  <figure>
-    <img src="figures/histogram.png" alt="Cosine similarity between LF and HF embeddings">
-    <figcaption>After training, real samples cluster near +1 LF–HF cosine similarity; fake samples land around −0.2.</figcaption>
-  </figure>
-
-  <figure>
-    <img src="figures/roc_improved.png" alt="ROC curves on high-pass-filtered audio">
-    <figcaption>On audio high-pass-filtered &gt; 4 kHz (LF removed), baselines collapse (AUC ≈ 0.75) while SONAR retains discriminative power (AUC ≈ 0.80).</figcaption>
-  </figure>
-
-  <figure>
+  <h2>Where the HF signal lives inside SONAR</h2>
+  <figure class="small">
     <img src="figures/c2_baseline_vs_sonar_hf.png" alt="HF-probe EER vs training fraction: baseline vs SONAR content vs SONAR noise">
-    <figcaption>HF-probe EER as we scale training data, at f<sub>c</sub> = 4 kHz. SONAR's <strong>noise branch</strong> (blue) — the SRM-filtered, JS-aligned encoder — sits well below the <strong>baseline XLSR</strong> (red) at every fraction. SONAR's <strong>content branch</strong> (green) is roughly on par with the baseline. The model isn't trained out of its spectral bias; it allocates a parallel encoder to the HF residual.</figcaption>
-  </figure>
-
-  <figure>
-    <img src="figures/dac_robustness.png" alt="Neural-codec robustness — clean vs DAC encode/decode">
-    <figcaption>Robustness to the Descript Audio Codec. EER rises modestly (6.00% → 8.60%) and AUC stays high (0.977 → 0.953) on a zero-shot evaluation; per-utterance score ranking is preserved (Spearman ρ = 0.944).</figcaption>
+    <figcaption>
+      <strong>Figure 3 — HF-probe EER as a function of training-data fraction (f<sub>c</sub> = 4 kHz).</strong>
+      Linear probes on high-pass-filtered embeddings test whether the encoder represents HF cues in a discriminative way. SONAR's <span style="color:#1f77b4"><strong>noise branch</strong></span> sits well below the <span style="color:#d62728"><strong>baseline XLSR</strong></span> at every fraction (28% relative HF-EER reduction at full data). SONAR's <span style="color:#2ca02c"><strong>content branch</strong></span> is roughly on par with the baseline. The encoder is not retrained out of its spectral bias — SONAR <em>compensates</em> for it architecturally, by allocating a parallel encoder to the HF residual and tying its distribution to the content distribution through the JS alignment objective.
+    </figcaption>
   </figure>
 </section>
 

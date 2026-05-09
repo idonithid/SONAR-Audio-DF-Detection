@@ -12,7 +12,6 @@ import pytest
 SAFE_MODULES = [
     "sonar",
     "sonar.srm_filters",
-    "sonar.HFFM",
     "sonar.utils",
     "sonar.eval_metric_LA",
     "sonar.eval_metric_DF",

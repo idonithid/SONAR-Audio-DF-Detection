@@ -13,7 +13,7 @@ import torch.nn.functional as F
 import plotly.graph_objects as go
 from scipy.fft import fft
 from scipy.signal import convolve
-from sonar.orthogonal_loss import *
+# removed: orthogonal_loss module deleted
 from sonar import eval_metric_LA as em
 from torch.utils.data import DataLoader, TensorDataset, DistributedSampler
 from sonar.utils import setup_seed, L2_regularization
@@ -41,7 +41,7 @@ import logging
 import warnings
 import os
 from sonar.srm_filters import *
-from sonar.entropy_loss import *
+# removed: entropy_loss module deleted
 from torch.cuda.amp import GradScaler
 from torch.optim.lr_scheduler import CosineAnnealingLR
 import plotly.graph_objects as go
