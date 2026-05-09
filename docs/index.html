@@ -69,6 +69,7 @@
     <li><strong>4× faster convergence.</strong> SONAR-Full stabilises in 12 epochs (Tak et al. trained 100); SONAR-Finetune in 4–6 epochs.</li>
     <li><strong>Robust to codecs.</strong> Through MP3, Opus, Vorbis, and the DAC neural codec, score ranking is preserved (Spearman ρ = 0.944 for DAC).</li>
     <li><strong>2× FLOPs, 2× params, but only ~25% wall-clock overhead</strong> because the two encoders run concurrently on GPU (29 ms → 57 ms / 4-s clip).</li>
+    <li><strong>SONAR's noise branch carries the HF discriminative load.</strong> Probing the two SSL branches separately on HP-filtered embeddings: the noise branch's HF-probe EER is <strong>2.16%</strong> at full data vs <strong>2.98%</strong> for the baseline (28% relative reduction); the content branch stays on par with the baseline. The encoder isn't retrained out of its spectral bias — SONAR <em>compensates</em> for it architecturally.</li>
   </ul>
 </section>
 
@@ -88,6 +89,16 @@
   <figure>
     <img src="figures/roc_improved.png" alt="ROC curves on high-pass-filtered audio">
     <figcaption>On audio high-pass-filtered &gt; 4 kHz (LF removed), baselines collapse (AUC ≈ 0.75) while SONAR retains discriminative power (AUC ≈ 0.80).</figcaption>
+  </figure>
+
+  <figure>
+    <img src="figures/c2_baseline_vs_sonar_hf.png" alt="HF-probe EER vs training fraction: baseline vs SONAR content vs SONAR noise">
+    <figcaption>HF-probe EER as we scale training data, at f<sub>c</sub> = 4 kHz. SONAR's <strong>noise branch</strong> (blue) — the SRM-filtered, JS-aligned encoder — sits well below the <strong>baseline XLSR</strong> (red) at every fraction. SONAR's <strong>content branch</strong> (green) is roughly on par with the baseline. The model isn't trained out of its spectral bias; it allocates a parallel encoder to the HF residual.</figcaption>
+  </figure>
+
+  <figure>
+    <img src="figures/dac_robustness.png" alt="Neural-codec robustness — clean vs DAC encode/decode">
+    <figcaption>Robustness to the Descript Audio Codec. EER rises modestly (6.00% → 8.60%) and AUC stays high (0.977 → 0.953) on a zero-shot evaluation; per-utterance score ranking is preserved (Spearman ρ = 0.944).</figcaption>
   </figure>
 </section>
 
